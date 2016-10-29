@@ -25,6 +25,9 @@ public class Processo {
         this.prioridade = prioridade;
         this.tempoChegada = tempoChegada;
         this.pc = 0;
+        for (int i = 0; i < fase; i++) {
+            filaEntradaSaida.add(0);
+        }
 //        this.tipo = tipo;
     }
 
@@ -33,8 +36,6 @@ public class Processo {
             if (i == io.get(j)) {
                 filaEntradaSaida.set(i, 1);
                 j++;
-            } else {
-                filaEntradaSaida.set(i, 0);
             }
         }
     }
@@ -102,7 +103,8 @@ public class Processo {
 
     public void imprimeFilaIO() {
         for (int i = 0; i < fase; i++) {
-            System.out.println(filaEntradaSaida.get(i));
+            System.out.print(filaEntradaSaida.get(i));
         }
+            System.out.print("\n");
     }
 }

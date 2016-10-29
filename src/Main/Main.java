@@ -5,7 +5,7 @@
  */
 package Main;
 
-import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -25,14 +25,27 @@ public class Main {
         List<String> dadosArquivo = manipulaArquivo.abrirArquivo(caminho); // armazena todas as linhas do arquivo
 
         //imprime a lista da string de dados do arquivo
-        String[] string;
-        for (String s : dadosArquivo) {
-            string = s.split(" ");
-            System.out.println(string[1]+"\t"+string[2]+"\t"+string[3]+"\t"+string[4]+"\n");
-            //Processo processo = new Processo(Integer.parseInt(string[0]), Integer.parseInt(string[1]), Integer.parseInt(string[2]), Integer.parseInt(string[3]));
-            //processo.toString();
+        for (String string : dadosArquivo) {
+            String aux[] = string.split(" ");
+            try {
+                Processo processo = new Processo(Integer.parseInt(aux[0]), Integer.parseInt(aux[1]), Integer.parseInt(aux[2]), Integer.parseInt(aux[3]));
+
+                LinkedList<Integer> entradaSaida = new LinkedList<>(); // Lista com as posições de entrada e saida do processo
+                for (int j = 4; j < aux.length; j++) {
+                    entradaSaida.add(Integer.parseInt(aux[j]));
+                }
+//            System.out.println("\n");
+//            for (int i = 0; i < entradaSaida.size(); i++) {
+//                System.out.println(entradaSaida.get(i));
+//            }
+                if (!entradaSaida.isEmpty()) {
+                    processo.addFilaEntradaSaida(entradaSaida);
+                }
+
+                processo.imprimeFilaIO();
+            } catch (Exception e) {
+                System.out.println("Erro na criação do processo!!");
+            }
         }
-
     }
-
 }
