@@ -24,7 +24,6 @@ public class ControlaListas{
         if(parametro == 0){// Prioridade
             if(p1.getPrioridade() <= p2.getPrioridade()){
                 return true;
-                
             }
         }
         

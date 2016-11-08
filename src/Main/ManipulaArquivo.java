@@ -20,6 +20,8 @@ import java.util.List;
 public class ManipulaArquivo {
 
     public ManipulaArquivo() {
+        
+        
     }
 
     public List<String> abrirArquivo(String caminho) {
@@ -57,6 +59,8 @@ public class ManipulaArquivo {
         } catch (Exception e) {//Catch exception if any
             System.err.println("Error: " + e.getMessage());
             return 1; //houve erro
+            
+            
         }
         return 0;
     }

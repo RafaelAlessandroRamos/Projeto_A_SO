@@ -5,7 +5,6 @@
  */
 package Main;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class Processo {
         for (int i = 0; i < fase; i++) {
             filaEntradaSaida.add(0);
         }
-//        this.tipo = tipo;
+        this.tipo = "U";
     }
 
     public void addFilaEntradaSaida(LinkedList<Integer> io) { // lista com as posições de entrada e saida como parametro
@@ -95,16 +94,17 @@ public class Processo {
     public void setFilaEntradaSaida(List<Integer> FilaEntradaSaida) {
         this.filaEntradaSaida = FilaEntradaSaida;
     }
-
-    @Override
-    public String toString() {
-        return "Processo{" + "id=" + id + ", fase=" + fase + ", prioridade=" + prioridade + ", tempoChegada=" + tempoChegada + '}';
-    }
-
+    
     public void imprimeFilaIO() {
         for (int i = 0; i < fase; i++) {
             System.out.print(filaEntradaSaida.get(i));
         }
             System.out.print("\n");
     }
+    
+    @Override
+    public String toString() {
+        return "Processo{" + "id=" + id + ", fase=" + fase + ", prioridade=" + prioridade + ", tempoChegada=" + tempoChegada + '}';
+    }
+
 }

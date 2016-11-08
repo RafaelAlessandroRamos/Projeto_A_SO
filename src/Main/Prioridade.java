@@ -1,5 +1,7 @@
 /*
- * Esta classse é responsáel por toda o escalonamento FIFO.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package Main;
 
@@ -10,13 +12,12 @@ import java.util.List;
  *
  * @author Rafael
  */
-public class Fifo {
-
+public class Prioridade {
     private ControlaListas controlaListas = new ControlaListas();
     private List<Integer> listaProcessosIO = new LinkedList<>();
     private int pc, tempoAtual = 0; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
 
-    public Fifo(ControlaListas controlaListas) {
+    public Prioridade(ControlaListas controlaListas) {
         this.controlaListas = controlaListas;
         executar();
     }
@@ -25,6 +26,8 @@ public class Fifo {
         for (int i = 0; i < controlaListas.getListaProcessos().size(); i++) {
             if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) {
                 controlaListas.addFilaProntos(controlaListas.getListaProcessos().get(i));
+                
+             
             }
         }
     }
@@ -35,10 +38,8 @@ public class Fifo {
             if (!controlaListas.getFilaProntos().isEmpty()) { // condição para verificar se existe processo pronto para executar
                 processar(controlaListas.getFilaProntos().get(0));
             }
-            
             this.tempoAtual++; // incrementa o tempo atual
         } while (true);
-        
     }
 
     public void processar(Processo processo) {
@@ -66,29 +67,5 @@ public class Fifo {
 
     public void bloqueado() {
 
-    }
-
-    public ControlaListas getControlaListas() {
-        return controlaListas;
-    }
-
-    public void setControlaListas(ControlaListas controlaListas) {
-        this.controlaListas = controlaListas;
-    }
-
-    public List<Integer> getListaProcessosIO() {
-        return listaProcessosIO;
-    }
-
-    public void setListaProcessosIO(List<Integer> listaProcessosIO) {
-        this.listaProcessosIO = listaProcessosIO;
-    }
-
-    public int getPc() {
-        return pc;
-    }
-
-    public void setPc(int pc) {
-        this.pc = pc;
     }
 }
