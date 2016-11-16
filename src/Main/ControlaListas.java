@@ -13,20 +13,27 @@ import java.util.List;
  * @author Rafael
  */
 public class ControlaListas{
-    private List<Processo> listaProcessos = new LinkedList<Processo>(); // Armazena todos os processos prontos
-    private List<Processo> filaProntos = new LinkedList<Processo>(); // Armazena os processos prontos para execução 
-    private List<Processo> filaBloqueados = new LinkedList<Processo>(); // Armazena os processos bloqueados para execução
+    private LinkedList<Processo> listaProcessos = new LinkedList<Processo>(); // Armazena todos os processos prontos
+    private LinkedList<Processo> filaProntos = new LinkedList<Processo>(); // Armazena os processos prontos para execução 
+    private LinkedList<Processo> filaBloqueados = new LinkedList<Processo>(); // Armazena os processos bloqueados para execução
+    private Processo executando;
+    private Processo processoSistema = new Processo(-1,1,-5,-1, "S");
 
     public ControlaListas() {
+        filaProntos.add(processoSistema);
     }
     
-    public boolean verificaItemOrdenar(Processo p1, Processo p2, int parametro){ // verifica para qual item a lista de prontos vai ser ordenada
+    private boolean verificaItemOrdenar(Processo p1, Processo p2, int parametro){ // verifica para qual item a lista de prontos vai ser ordenada
         if(parametro == 0){// Prioridade
             if(p1.getPrioridade() <= p2.getPrioridade()){
                 return true;
             }
         }
-        
+        if(parametro == 1){// SJF
+            if((p1.getFase() - p1.getPc()) <= (p2.getFase() - p2.getPc())){
+                return true;
+            }
+        }
         return false;
     }
     
@@ -83,28 +90,45 @@ public class ControlaListas{
         filaBloqueados.remove(processo.getId());
     }
  
-    public List<Processo> getFilaProntos() {
+    public LinkedList<Processo> getFilaProntos() {
         return filaProntos;
     }
 
-    public void setFilaProntos(List<Processo> filaProntos) {
+    public void setFilaProntos(LinkedList<Processo> filaProntos) {
         this.filaProntos = filaProntos;
     }
 
-    public List<Processo> getFilaBloqueados() {
+    public LinkedList<Processo> getFilaBloqueados() {
         return filaBloqueados;
     }
 
-    public void setFilaBloqueados(List<Processo> filaBloqueados) {
+    public void setFilaBloqueados(LinkedList<Processo> filaBloqueados) {
         this.filaBloqueados = filaBloqueados;
     }
 
-    public List<Processo> getListaProcessos() {
+    public LinkedList<Processo> getListaProcessos() {
         return listaProcessos;
     }
 
-    public void setListaProcessos(List<Processo> listaProcessos) {
+    public void setListaProcessos(LinkedList<Processo> listaProcessos) {
         this.listaProcessos = listaProcessos;
     }
+
+    public Processo getExecutando() {
+        return executando;
+    }
+
+    public void setExecutando(Processo executando) {
+        this.executando = executando;
+    }
+
+    public Processo getProcessoSistema() {
+        return processoSistema;
+    }
+
+    public void setProcessoSistema(Processo processoSistema) {
+        this.processoSistema = processoSistema;
+    }
+    
     
 }

@@ -9,12 +9,11 @@ package Main;
  *
  * @author Rafael
  */
-public class Prioridade {
-
+public class SJF {
     private ControlaListas controlaListas = new ControlaListas();
     private int tempoAtual = 0, flag = 0; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
 
-    public Prioridade(ControlaListas controlaListas) {
+    public SJF(ControlaListas controlaListas) {
         this.controlaListas = controlaListas;
         executar();
     }
@@ -23,15 +22,15 @@ public class Prioridade {
         for (int i = 0; i < controlaListas.getListaProcessos().size(); i++) {
             if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) {
                 controlaListas.addFilaProntos(controlaListas.getListaProcessos().get(i)); // Adiciona um processo na lista de prontos
-                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 0); // ordena a lista de prontos por prioridade
+                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
             }
         }
     }
 
-    public void menorPcMesmaPrioridade() {
+    public void menorPcMesmoTamanho() {
         Processo aux = new Processo();
-        if (controlaListas.getFilaProntos().getFirst().getPrioridade() == controlaListas.getFilaProntos().get(1).getPrioridade()) {
-            if (controlaListas.getFilaProntos().getFirst().getTempoChegada() <= controlaListas.getFilaProntos().get(1).getTempoChegada()) {
+        if ((controlaListas.getFilaProntos().getFirst().getFase() - controlaListas.getFilaProntos().getFirst().getPc())  == (controlaListas.getFilaProntos().get(1).getFase() - controlaListas.getFilaProntos().get(1).getPc())) {
+            if (controlaListas.getFilaProntos().getFirst().getTempoChegada() >= controlaListas.getFilaProntos().get(1).getTempoChegada()) {
                 aux = controlaListas.getFilaProntos().getFirst();
                 controlaListas.getFilaProntos().set(0, controlaListas.getFilaProntos().get(1));
                 controlaListas.getFilaProntos().set(1, aux);
@@ -43,7 +42,7 @@ public class Prioridade {
         do {
             verificaTempo(this.tempoAtual);
             for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
-                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 0); // ordena a lista de prontos por prioridade
+                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
                 controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
                 controlaListas.getFilaProntos().removeFirst();
                 this.flag++; // flag para chamar o processo do sistema
@@ -82,7 +81,7 @@ public class Prioridade {
         controlaListas.addFilaProntos(controlaListas.getFilaBloqueados().getFirst());
         controlaListas.getFilaBloqueados().removeFirst();
         controlaListas.addFilaProntos(controlaListas.getExecutando());
-        controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 0); // ordena a lista de prontos por prioridade
+        controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
     }
 
     private void bloqueado() {

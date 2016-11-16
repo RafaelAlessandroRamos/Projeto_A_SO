@@ -6,7 +6,6 @@
 package Main;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  *
@@ -15,8 +14,23 @@ import java.util.List;
 public class Processo {
 
     private int id, fase, prioridade, tempoChegada, pc;
-    private String tipo; // Usuario (U) ou sistema(S)
-    private List<Integer> filaEntradaSaida = new LinkedList<>(); // mapa do processo
+    private String tipo, io = ""; // Usuario (U) ou sistema(S)
+    private LinkedList<Integer> filaEntradaSaida = new LinkedList<>(); // mapa do processo
+
+    public Processo() {
+    }
+    
+    public Processo(int id, int fase, int prioridade, int tempoChegada, String tipo) {
+        this.id = id;
+        this.fase = fase;
+        this.prioridade = prioridade;
+        this.tempoChegada = tempoChegada;
+        this.pc = 0;
+        for (int i = 0; i < fase; i++) {
+            filaEntradaSaida.add(0);
+        }
+        this.tipo = tipo;
+    }
 
     public Processo(int id, int fase, int prioridade, int tempoChegada) {
         this.id = id;
@@ -87,24 +101,27 @@ public class Processo {
         this.tipo = String.valueOf(tipo).toUpperCase();
     }
 
-    public List<Integer> getFilaEntradaSaida() {
+    public LinkedList<Integer> getFilaEntradaSaida() {
         return filaEntradaSaida;
     }
 
-    public void setFilaEntradaSaida(List<Integer> FilaEntradaSaida) {
+    public void setFilaEntradaSaida(LinkedList<Integer> FilaEntradaSaida) {
         this.filaEntradaSaida = FilaEntradaSaida;
     }
     
     public void imprimeFilaIO() {
-        for (int i = 0; i < fase; i++) {
-            System.out.print(filaEntradaSaida.get(i));
+        io = "";
+        for (int i = pc; i < fase; i++) {
+            io += filaEntradaSaida.get(i);
+//            System.out.print(filaEntradaSaida.get(i));
         }
-            System.out.print("\n");
+//            System.out.print("\n");
     }
     
     @Override
     public String toString() {
-        return "Processo{" + "id=" + id + ", fase=" + fase + ", prioridade=" + prioridade + ", tempoChegada=" + tempoChegada + '}';
+        imprimeFilaIO();
+        return "Processo{" + "id = " + id + ", fase = " + fase + ", prioridade = " + prioridade + ", tempoChegada = " + tempoChegada + ", PC= " + pc + ", tipo = " + tipo + ", listaIO = " + getFilaEntradaSaida() + ", io = " + io +'}';
     }
 
 }
