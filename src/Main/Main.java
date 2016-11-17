@@ -45,10 +45,11 @@ public class Main {
             }
             
         }
-            System.out.println(controlaListas.getListaProcessos().toString());
-//            Fifo fifo = new Fifo(controlaListas);
+//            System.out.println(controlaListas.getListaProcessos().toString());
+            Fifo fifo = new Fifo(controlaListas);
 //            Prioridade prioridade = new Prioridade(controlaListas);
-            SJF sjf = new SJF(controlaListas);
+//            SJF sjf = new SJF(controlaListas);
+//            RoundRobin roundRobin = new RoundRobin(controlaListas);
             
             //fifo.getControlaListas().setListaProcessos(controlaListas.getListaProcessos()); // Passa a lista de processos para o controlador de listas de rocessos do fifo
     }

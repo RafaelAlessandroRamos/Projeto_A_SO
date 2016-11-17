@@ -3,9 +3,6 @@
  */
 package Main;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  *
  * @author Rafael
@@ -13,8 +10,7 @@ import java.util.List;
 public class Fifo {
 
     private ControlaListas controlaListas = new ControlaListas();
-    private List<Integer> listaProcessosIO = new LinkedList<>();
-    private int pc, tempoAtual = 0; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
+    private int tempoAtual = 0; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
 
     public Fifo(ControlaListas controlaListas) {
         this.controlaListas = controlaListas;
@@ -32,8 +28,10 @@ public class Fifo {
     public void executar() {
         do {
             verificaTempo(this.tempoAtual);
-            if (!controlaListas.getFilaProntos().isEmpty()) { // condição para verificar se existe processo pronto para executar
-                processar(controlaListas.getFilaProntos().get(0));
+            for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
+                controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
+                controlaListas.getFilaProntos().removeFirst();
+                processar(controlaListas.getExecutando());
             }
             this.tempoAtual++; // incrementa o tempo atual
         } while (true);
@@ -42,16 +40,41 @@ public class Fifo {
 
     public void processar(Processo processo) {
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
-            atenderBloqueado();
+            if (!controlaListas.getFilaBloqueados().isEmpty()) {
+                atenderBloqueado();
+            }
         } else {
+            if (controlaListas.getExecutando() != null) { // Se na posição pc estiver 1 o processo é bloqueado
+                processo.setPc(processo.getPc() + 1); // pc+1 no processo
+                bloqueado();
+            } else {
+                processo.setPc(processo.getPc() + 1); // pc+1 no processo
+            }
+            if ((processo.getPc() == processo.getFase()) && (processo.getTipo().equals("U"))) { // Se acabou a lista de IO o processo encerra
+                controlaListas.setExecutando(null);
+            } 
             System.out.println(processo.toString());
-            controlaListas.getFilaProntos().remove(0);
         }
     }
 
     public void atenderBloqueado() {
-        controlaListas.addFilaProntos(controlaListas.getFilaBloqueados().get(0));
-        controlaListas.getFilaBloqueados().remove(0);
+        controlaListas.addFilaProntos(controlaListas.getFilaBloqueados().getFirst());
+        controlaListas.getFilaBloqueados().removeFirst();
+    }
+    
+    private void bloqueado() {
+        controlaListas.addFilaBloqueados(controlaListas.getExecutando());
+        controlaListas.setExecutando(null);
+    }
+
+    private Processo procuraProcessoSistema(Processo processo) {
+        for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
+            if (controlaListas.getFilaProntos().get(i).getTipo().equals("S")) {
+                processo = controlaListas.getFilaProntos().get(i);
+                controlaListas.getFilaProntos().remove(i);
+            }
+        }
+        return processo;
     }
 
     public ControlaListas getControlaListas() {
@@ -60,21 +83,5 @@ public class Fifo {
 
     public void setControlaListas(ControlaListas controlaListas) {
         this.controlaListas = controlaListas;
-    }
-
-    public List<Integer> getListaProcessosIO() {
-        return listaProcessosIO;
-    }
-
-    public void setListaProcessosIO(List<Integer> listaProcessosIO) {
-        this.listaProcessosIO = listaProcessosIO;
-    }
-
-    public int getPc() {
-        return pc;
-    }
-
-    public void setPc(int pc) {
-        this.pc = pc;
     }
 }
