@@ -3,6 +3,7 @@
  */
 package Main;
 
+import java.util.concurrent.DelayQueue;
 
 /**
  *
@@ -22,21 +23,29 @@ public class Fifo {
         for (int i = 0; i < controlaListas.getListaProcessos().size(); i++) {
             if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) {
                 controlaListas.addFilaProntos(controlaListas.getListaProcessos().get(i));
+                controlaListas.getListaProcessos().remove(i);
             }
+        }
+        if (controlaListas.getListaProcessos().size() == 1) {
+            controlaListas.getListaProcessos().removeFirst();
         }
     }
 
     public void executar() {
         do {
+//            System.out.println("LISTA processo: " + controlaListas.getListaProcessos());
+//            System.out.println("=======processo: " + controlaListas.getExecutando());
+            if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getExecutando() == null) {
+                break;
+            }
             verificaTempo(this.tempoAtual);
+            this.tempoAtual++; // incrementa o tempo atual
             for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
                 controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
                 controlaListas.getFilaProntos().removeFirst();
                 processar(controlaListas.getExecutando());
             }
-            this.tempoAtual++; // incrementa o tempo atual
         } while (true);
-
     }
 
     public void processar(Processo processo) {
@@ -45,15 +54,16 @@ public class Fifo {
                 atenderBloqueado();
             }
         } else {
-            if (controlaListas.getExecutando() != null) { // Se na posição pc estiver 1 o processo é bloqueado
+            if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 1 o processo é bloqueado
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
                 bloqueado();
+                atenderBloqueado();
             } else {
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
             }
-            if ((processo.getPc() == processo.getFase()) && (processo.getTipo().equals("U"))) { // Se acabou a lista de IO o processo encerra
+            if ((processo.getPc() < processo.getFase()) && (processo.getTipo().equals("U"))) { // Se acabou a lista de IO o processo encerra
                 controlaListas.setExecutando(null);
-            } 
+            }
             System.out.println(processo.toString());
         }
     }
@@ -62,10 +72,10 @@ public class Fifo {
         controlaListas.addFilaProntos(controlaListas.getFilaBloqueados().getFirst());
         controlaListas.getFilaBloqueados().removeFirst();
     }
-    
+
     private void bloqueado() {
         controlaListas.addFilaBloqueados(controlaListas.getExecutando());
-        controlaListas.setExecutando(null);
+//        controlaListas.setExecutando(null);
     }
 
     private Processo procuraProcessoSistema(Processo processo) {
@@ -76,13 +86,5 @@ public class Fifo {
             }
         }
         return processo;
-    }
-
-    public ControlaListas getControlaListas() {
-        return controlaListas;
-    }
-
-    public void setControlaListas(ControlaListas controlaListas) {
-        this.controlaListas = controlaListas;
     }
 }

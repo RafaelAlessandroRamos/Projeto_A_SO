@@ -5,10 +5,7 @@
  */
 package Main;
 
-import com.sun.org.apache.bcel.internal.generic.SWITCH;
 import java.util.Scanner;
-import javax.swing.JOptionPane;
-
 /**
  *
  * @author Rafael
@@ -25,18 +22,19 @@ public class Menu {
     
     public void estruturaMenu(){
         System.out.println(" 1 - FIFO \n 2 - Prioridade \n 3 - SJF \n 4 - Round Robin");
+        System.out.print(" Escolha um escalonador de processos: ");
         opcao = scanner.nextInt();
         switch (opcao) {
-            case 0:
+            case 1:
                 Fifo fifo = new Fifo(controlaListas);
                 break;
-            case 1:
+            case 2:
                 Prioridade prioridade = new Prioridade(controlaListas);
                 break;
-            case 2:
+            case 3:
                 SJF sjf = new SJF(controlaListas);
                 break;
-            case 3:
+            case 4:
                 RoundRobin roundRobin = new RoundRobin(controlaListas);
                 break;
             default:

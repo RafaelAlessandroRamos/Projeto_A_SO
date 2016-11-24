@@ -10,8 +10,9 @@ package Main;
  * @author Rafael
  */
 public class SJF {
+
     private ControlaListas controlaListas = new ControlaListas();
-    private int tempoAtual = 0, flag = 0; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
+    private int tempoAtual = 0; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
 
     public SJF(ControlaListas controlaListas) {
         this.controlaListas = controlaListas;
@@ -22,14 +23,18 @@ public class SJF {
         for (int i = 0; i < controlaListas.getListaProcessos().size(); i++) {
             if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) {
                 controlaListas.addFilaProntos(controlaListas.getListaProcessos().get(i)); // Adiciona um processo na lista de prontos
+                controlaListas.getListaProcessos().remove(i); // remove da lista de processos o processo escolhido
                 controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
             }
+        }
+        if (controlaListas.getListaProcessos().size() == 1) {
+            controlaListas.getListaProcessos().removeFirst();
         }
     }
 
     public void menorPcMesmoTamanho() {
         Processo aux = new Processo();
-        if ((controlaListas.getFilaProntos().getFirst().getFase() - controlaListas.getFilaProntos().getFirst().getPc())  == (controlaListas.getFilaProntos().get(1).getFase() - controlaListas.getFilaProntos().get(1).getPc())) {
+        if ((controlaListas.getFilaProntos().getFirst().getFase() - controlaListas.getFilaProntos().getFirst().getPc()) == (controlaListas.getFilaProntos().get(1).getFase() - controlaListas.getFilaProntos().get(1).getPc())) {
             if (controlaListas.getFilaProntos().getFirst().getTempoChegada() >= controlaListas.getFilaProntos().get(1).getTempoChegada()) {
                 aux = controlaListas.getFilaProntos().getFirst();
                 controlaListas.getFilaProntos().set(0, controlaListas.getFilaProntos().get(1));
@@ -40,24 +45,30 @@ public class SJF {
 
     public void executar() {
         do {
+//            System.out.println("LISTA PROCESSOS: " + controlaListas.getListaProcessos());
+//            System.out.println("LISTA BLOQUEADOS ===: " + controlaListas.getFilaBloqueados());
+//            System.out.println("LISTA prontos ===: " + controlaListas.getFilaProntos());
+//            System.out.println("=======processo: " + controlaListas.getExecutando());
+            if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getExecutando() == null) {
+                break;
+            }
             verificaTempo(this.tempoAtual);
+            this.tempoAtual++; // incrementa o tempo atual
             for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
                 controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
                 controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
                 controlaListas.getFilaProntos().removeFirst();
-                this.flag++; // flag para chamar o processo do sistema
-                if (this.flag == 3) { // a cada tres iterações o processo do sistema é chamado
+                if (this.tempoAtual % 3 == 0 || controlaListas.getFilaProntos().isEmpty()) { // a cada tres iterações o processo do sistema é chamado
                     controlaListas.setExecutando(procuraProcessoSistema(controlaListas.getExecutando()));
-                    this.flag = 0;
                 }
                 processar(controlaListas.getExecutando());
             }
-            this.tempoAtual++; // incrementa o tempo atual
         } while (true);
     }
 
     public void processar(Processo processo) {
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
+                System.out.println("--------SISTEMA -------");
             if (!controlaListas.getFilaBloqueados().isEmpty()) {
                 atenderBloqueado();
             }
@@ -70,7 +81,8 @@ public class SJF {
             }
             if ((processo.getPc() == processo.getFase()) && (processo.getTipo().equals("U"))) { // Se acabou a lista de IO o processo encerra
                 controlaListas.setExecutando(null);
-            } else if (processo.getPc() != processo.getFase()) {
+            }
+            if (processo.getPc() < processo.getFase()) {
                 controlaListas.addFilaProntos(processo);
             }
             System.out.println(processo.toString());
@@ -82,6 +94,7 @@ public class SJF {
         controlaListas.getFilaBloqueados().removeFirst();
         controlaListas.addFilaProntos(controlaListas.getExecutando());
         controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
+//        controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
     }
 
     private void bloqueado() {
@@ -97,13 +110,5 @@ public class SJF {
             }
         }
         return processo;
-    }
-
-    public ControlaListas getControlaListas() {
-        return controlaListas;
-    }
-
-    public void setControlaListas(ControlaListas controlaListas) {
-        this.controlaListas = controlaListas;
     }
 }

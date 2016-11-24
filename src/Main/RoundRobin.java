@@ -12,7 +12,7 @@ package Main;
 public class RoundRobin {
 
     private ControlaListas controlaListas = new ControlaListas();
-    private int tempoAtual = 0, flag = 0, quantum = 0, quantumMax = 4; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
+    private int tempoAtual = 0, quantum = 0, quantumMax = 4; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
 
     public RoundRobin(ControlaListas controlaListas) {
         this.controlaListas = controlaListas;
@@ -23,7 +23,11 @@ public class RoundRobin {
         for (int i = 0; i < controlaListas.getListaProcessos().size(); i++) {
             if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) {
                 controlaListas.addFilaProntos(controlaListas.getListaProcessos().get(i)); // Adiciona um processo na lista de prontos
+                controlaListas.getListaProcessos().remove(i); // remove da lista de processos o processo escolhido
             }
+        }
+        if (controlaListas.getListaProcessos().size() == 1) {
+            controlaListas.getListaProcessos().removeFirst();
         }
     }
 
@@ -38,23 +42,22 @@ public class RoundRobin {
     public void executar() {
         do {
             verificaTempo(this.tempoAtual);
+            this.tempoAtual++; // incrementa o tempo atual
             for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
                 controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
                 controlaListas.getFilaProntos().removeFirst();
-                this.flag++; // flag para chamar o processo do sistema
-                if (this.flag == 3) { // a cada tres iterações o processo do sistema é chamado
+                if (this.tempoAtual % 3 == 0 || controlaListas.getFilaProntos().isEmpty()) { // a cada tres iterações o processo do sistema é chamado
                     controlaListas.setExecutando(procuraProcessoSistema(controlaListas.getExecutando()));
-                    this.flag = 0;
                 }
                 processar(controlaListas.getExecutando());
             }
-            this.tempoAtual++; // incrementa o tempo atual
         } while (true);
     }
 
     public void processar(Processo processo) {
+        System.out.println(processo.getTipo());
         quantum++;
-                verificaQuantum();
+        verificaQuantum();
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
             quantum = 0;
             if (!controlaListas.getFilaBloqueados().isEmpty()) {

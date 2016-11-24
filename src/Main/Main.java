@@ -34,7 +34,7 @@ public class Main {
                 LinkedList<Integer> entradaSaida = new LinkedList<>(); // Lista com as posições de entrada e saida do processo
 
                 for (int j = 4; j < aux.length; j++) { // laço para verificar se existe posições de IO do arquivo
-                    entradaSaida.add(Integer.parseInt(aux[j])-1);
+                    entradaSaida.add(Integer.parseInt(aux[j]) - 1);
                 }
                 if (!entradaSaida.isEmpty()) { // Condição para verificar se existe IO na lista entradaSaida
                     processo.addFilaEntradaSaida(entradaSaida);
@@ -43,16 +43,9 @@ public class Main {
             } catch (Exception e) {
                 System.out.println("Erro na criação do processo!!");
             }
-            
+
         }
+        
         Menu menu = new Menu(controlaListas);
-//            System.out.println(controlaListas.getListaProcessos().toString());
-//            Fifo fifo = new Fifo(controlaListas);
-//            Prioridade prioridade = new Prioridade(controlaListas);
-//            SJF sjf = new SJF(controlaListas);
-//            RoundRobin roundRobin = new RoundRobin(controlaListas);
-            
-            
-            //fifo.getControlaListas().setListaProcessos(controlaListas.getListaProcessos()); // Passa a lista de processos para o controlador de listas de rocessos do fifo
     }
 }

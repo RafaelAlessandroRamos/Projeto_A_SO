@@ -17,10 +17,11 @@ public class ControlaListas{
     private LinkedList<Processo> filaProntos = new LinkedList<Processo>(); // Armazena os processos prontos para execução 
     private LinkedList<Processo> filaBloqueados = new LinkedList<Processo>(); // Armazena os processos bloqueados para execução
     private Processo executando;
-    private Processo processoSistema = new Processo(-1,1,-5,-1, "S");
+    private Processo processoSistema = new Processo(-1,1,-5,-1,"S");
 
     public ControlaListas() {
-        filaProntos.add(processoSistema);
+//        filaProntos.add(processoSistema);
+        executando = processoSistema;
     }
     
     private boolean verificaItemOrdenar(Processo p1, Processo p2, int parametro){ // verifica para qual item a lista de prontos vai ser ordenada
@@ -29,7 +30,7 @@ public class ControlaListas{
                 return true;
             }
         }
-        if(parametro == 1){// SJF
+        else if(parametro == 1){// SJF
             if((p1.getFase() - p1.getPc()) <= (p2.getFase() - p2.getPc())){
                 return true;
             }
