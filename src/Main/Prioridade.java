@@ -46,6 +46,9 @@ public class Prioridade {
 
     public void executar() {
         do {
+            System.out.println(" ========LISTA PRONTOS     " + controlaListas.getFilaProntos());
+            System.out.println(" ---------LISTA BLOQUEADOS  " + controlaListas.getFilaBloqueados());
+            System.out.println(" **********EXECULTANDO  " + controlaListas.getExecutando());
             if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getFilaBloqueados().isEmpty() && controlaListas.getFilaProntos().isEmpty() && controlaListas.getExecutando() == null) { // condição de parada: se tudo estiver vazio para o laço
                 break;
             }
@@ -74,15 +77,16 @@ public class Prioridade {
                 atenderBloqueado(); // desbloqueia o primeiro processo da fila de bloqueados
             }
         }
-        if (processo.getPc() < processo.getFase()) { // se o pc é menor que o tamanho do processo
+        if (processo.getPc() < processo.getFase() && processo.getTipo().equals("U")) { // se o pc é menor que o tamanho do processo
             controlaListas.addFilaProntos(processo);
             if (processo.getFilaEntradaSaida().get(processo.getPc()) == 0) { // Se na posição pc estiver 0, pc + 1
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
-            } else {
+            } else if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 0, pc + 1
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
                 bloqueado();
                 controlaListas.setExecutando(null);
             }
+
         } else if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
             controlaListas.setExecutando(null);
         }

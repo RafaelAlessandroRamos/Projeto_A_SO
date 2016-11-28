@@ -21,13 +21,13 @@ public class SJF {
 
     public void verificaTempo(int tempoAtual) {
         for (int i = 0; i < controlaListas.getListaProcessos().size(); i++) {
-            if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) {
+            if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) { // verifica se o tempo atual na linha de tempo é igual ao tempo de chegada de algum processo na lista de processos
                 controlaListas.addFilaProntos(controlaListas.getListaProcessos().get(i)); // Adiciona um processo na lista de prontos
                 controlaListas.getListaProcessos().remove(i); // remove da lista de processos o processo escolhido
-                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
+                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por menor job
             }
         }
-        if (controlaListas.getListaProcessos().size() == 1) {
+        if (controlaListas.getListaProcessos().size() == 1) { // remove o ultimo processo da lista de processos
             controlaListas.getListaProcessos().removeFirst();
         }
     }
@@ -45,70 +45,56 @@ public class SJF {
 
     public void executar() {
         do {
-//            System.out.println("LISTA PROCESSOS: " + controlaListas.getListaProcessos());
-//            System.out.println("LISTA BLOQUEADOS ===: " + controlaListas.getFilaBloqueados());
-//            System.out.println("LISTA prontos ===: " + controlaListas.getFilaProntos());
-//            System.out.println("=======processo: " + controlaListas.getExecutando());
-            if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getExecutando() == null) {
+            if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getFilaBloqueados().isEmpty() && controlaListas.getFilaProntos().isEmpty() && controlaListas.getExecutando() == null) { // condição de parada: se tudo estiver vazio para o laço
                 break;
             }
             verificaTempo(this.tempoAtual);
-            this.tempoAtual++; // incrementa o tempo atual
-            for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
-                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
-                controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
+            if (!controlaListas.getFilaProntos().isEmpty()) { // se a fila de pronto nao estiver vazia
+                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por menor job
+                controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // pega o primeiro processo da lista de pronto para executar
                 controlaListas.getFilaProntos().removeFirst();
-                if (this.tempoAtual % 3 == 0 || controlaListas.getFilaProntos().isEmpty()) { // a cada tres iterações o processo do sistema é chamado
-                    controlaListas.setExecutando(procuraProcessoSistema(controlaListas.getExecutando()));
-                }
-                processar(controlaListas.getExecutando());
             }
+            if (this.tempoAtual % 3 == 0) { // a cada tres iterações o processo do sistema é chamado
+                controlaListas.addFilaProntos(controlaListas.getProcessoSistema()); // adiciona processo do sistema na lista de prontos
+                controlaListas.getProcessoSistema().setPc(0); // seta o pc do processo de sistema para 0
+                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por menor job
+                controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // o primeiro da fila de prontos vai executar
+                controlaListas.getFilaProntos().removeFirst();
+            }
+            processar(controlaListas.getExecutando());
+            this.tempoAtual++; // incrementa o tempo atual
         } while (true);
     }
 
     public void processar(Processo processo) {
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
-                System.out.println("--------SISTEMA -------");
+            System.out.println("-------- SISTEMA ---------");
             if (!controlaListas.getFilaBloqueados().isEmpty()) {
-                atenderBloqueado();
+                atenderBloqueado(); // desbloqueia o primeiro processo da fila de bloqueados
             }
-        } else {
-            if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 1 o processo é bloqueado
+        }
+        if (processo.getPc() < processo.getFase()) { // se o pc é menor que o tamanho do processo
+            controlaListas.addFilaProntos(processo);
+            if (processo.getFilaEntradaSaida().get(processo.getPc()) == 0) { // Se na posição pc estiver 0, pc + 1
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
-                bloqueado();
             } else {
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
-            }
-            if ((processo.getPc() == processo.getFase()) && (processo.getTipo().equals("U"))) { // Se acabou a lista de IO o processo encerra
+                bloqueado();
                 controlaListas.setExecutando(null);
             }
-            if (processo.getPc() < processo.getFase()) {
-                controlaListas.addFilaProntos(processo);
-            }
-            System.out.println(processo.toString());
+        } else if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
+            controlaListas.setExecutando(null);
         }
+        System.out.println(processo.toString());
     }
 
     private void atenderBloqueado() {
         controlaListas.addFilaProntos(controlaListas.getFilaBloqueados().getFirst());
         controlaListas.getFilaBloqueados().removeFirst();
-        controlaListas.addFilaProntos(controlaListas.getExecutando());
-        controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
-//        controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
     }
 
     private void bloqueado() {
         controlaListas.addFilaBloqueados(controlaListas.getExecutando());
         controlaListas.setExecutando(null);
-    }
-
-    private Processo procuraProcessoSistema(Processo processo) {
-        for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
-            if (controlaListas.getFilaProntos().get(i).getTipo().equals("S")) {
-                processo = controlaListas.getFilaProntos().get(i);
-                controlaListas.getFilaProntos().remove(i);
-            }
-        }
-        return processo;
     }
 }

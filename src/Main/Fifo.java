@@ -61,7 +61,7 @@ public class Fifo {
             } else {
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
             }
-            if ((processo.getPc() < processo.getFase()) && (processo.getTipo().equals("U"))) { // Se acabou a lista de IO o processo encerra
+            if ((processo.getPc() <= processo.getFase()) && (processo.getTipo().equals("U"))) { // Se acabou a lista de IO o processo encerra
                 controlaListas.setExecutando(null);
             }
             System.out.println(processo.toString());
