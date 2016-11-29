@@ -12,7 +12,7 @@ package Main;
 public class RoundRobin {
 
     private ControlaListas controlaListas = new ControlaListas();
-    private int tempoAtual = 0, quantum = 0, quantumMax = 4; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
+    private int tempoAtual = 0, quantum = 0, quantumMax = 3; // tempoAtual serve para saber o tempo atual no tempo de execução para saber se existe processos a serem executados naquele tempo
 
     public RoundRobin(ControlaListas controlaListas) {
         this.controlaListas = controlaListas;
@@ -26,9 +26,6 @@ public class RoundRobin {
                 controlaListas.getListaProcessos().remove(i); // remove da lista de processos o processo escolhido
             }
         }
-        if (controlaListas.getListaProcessos().size() == 1) {
-            controlaListas.getListaProcessos().removeFirst();
-        }
     }
 
     private void verificaQuantum() {
@@ -36,48 +33,56 @@ public class RoundRobin {
             controlaListas.addFilaProntos(controlaListas.getExecutando());
             controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
             controlaListas.getFilaProntos().removeFirst();
+            quantum = 0;
         }
     }
 
     public void executar() {
         do {
-            verificaTempo(this.tempoAtual);
-            this.tempoAtual++; // incrementa o tempo atual
-            for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
-                controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst());
-                controlaListas.getFilaProntos().removeFirst();
-                if (this.tempoAtual % 3 == 0 || controlaListas.getFilaProntos().isEmpty()) { // a cada tres iterações o processo do sistema é chamado
-                    controlaListas.setExecutando(procuraProcessoSistema(controlaListas.getExecutando()));
-                }
-                processar(controlaListas.getExecutando());
+            //System.out.println(" ========LISTA PRONTOS     " + controlaListas.getFilaProntos());
+            //System.out.println(" ---------LISTA BLOQUEADOS  " + controlaListas.getFilaBloqueados());
+            //System.out.println(" **********EXECULTANDO  " + controlaListas.getExecutando());
+            if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getFilaBloqueados().isEmpty() && controlaListas.getFilaProntos().isEmpty() && controlaListas.getExecutando() == null) { // condição de parada: se tudo estiver vazio para o laço
+                break;
             }
+            verificaTempo(this.tempoAtual);
+            if (!controlaListas.getFilaProntos().isEmpty()) { // se a fila de pronto nao estiver vazia
+                controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // pega o primeiro processo da lista de pronto para executar
+                controlaListas.getFilaProntos().removeFirst();
+            }
+            if (this.tempoAtual % 7 == 0) { // a cada tres iterações o processo do sistema é chamado
+                controlaListas.addFilaProntos(controlaListas.getProcessoSistema()); // adiciona processo do sistema na lista de prontos
+            }
+            processar(controlaListas.getExecutando());
+            verificaQuantum();
+            this.tempoAtual++; // incrementa o tempo atual
         } while (true);
     }
 
     public void processar(Processo processo) {
-        System.out.println(processo.getTipo());
         quantum++;
-        verificaQuantum();
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
-            quantum = 0;
+            System.out.println("-------- SISTEMA ---------");
             if (!controlaListas.getFilaBloqueados().isEmpty()) {
-                atenderBloqueado();
+                atenderBloqueado(); // desbloqueia o primeiro processo da fila de bloqueados
             }
-        } else {
-            if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 1 o processo é bloqueado
+            controlaListas.setExecutando(null);
+            quantum = 0;
+        }
+        if (processo.getPc() < processo.getFase() && processo.getTipo().equals("U")) { // se o pc é menor que o tamanho do processo
+            if (processo.getFilaEntradaSaida().get(processo.getPc()) == 0) { // Se na posição pc estiver 0, pc + 1
+                processo.setPc(processo.getPc() + 1); // pc+1 no processo
+            } else if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 0, pc + 1
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
                 bloqueado();
-                quantum = 0;
-            } else {
-                processo.setPc(processo.getPc() + 1); // pc+1 no processo
-            }
-            if ((processo.getPc() == processo.getFase()) && (processo.getTipo().equals("U"))) { // Se acabou a lista de IO o processo encerra
                 controlaListas.setExecutando(null);
                 quantum = 0;
-            } else if (processo.getPc() < processo.getFase()) {
-                controlaListas.addFilaProntos(processo);
             }
+            controlaListas.addFilaProntos(processo);
             System.out.println(processo.toString());
+        } else if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
+            controlaListas.setExecutando(null);
+            quantum = 0;
         }
     }
 
@@ -90,23 +95,5 @@ public class RoundRobin {
     private void bloqueado() {
         controlaListas.addFilaBloqueados(controlaListas.getExecutando());
         controlaListas.setExecutando(null);
-    }
-
-    private Processo procuraProcessoSistema(Processo processo) {
-        for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
-            if (controlaListas.getFilaProntos().get(i).getTipo().equals("S")) {
-                processo = controlaListas.getFilaProntos().get(i);
-                controlaListas.getFilaProntos().remove(i);
-            }
-        }
-        return processo;
-    }
-
-    public ControlaListas getControlaListas() {
-        return controlaListas;
-    }
-
-    public void setControlaListas(ControlaListas controlaListas) {
-        this.controlaListas = controlaListas;
     }
 }
