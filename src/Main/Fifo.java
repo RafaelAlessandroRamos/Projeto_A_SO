@@ -30,9 +30,6 @@ public class Fifo {
 
     public void executar() {
         do {
-            //System.out.println(" ========LISTA PRONTOS     " + controlaListas.getFilaProntos());
-            //System.out.println(" ---------LISTA BLOQUEADOS  " + controlaListas.getFilaBloqueados());
-            //System.out.println(" **********EXECULTANDO  " + controlaListas.getExecutando());
             if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getFilaBloqueados().isEmpty() && controlaListas.getFilaProntos().isEmpty() && controlaListas.getExecutando() == null) { // condição de parada: se tudo estiver vazio para o laço
                 break;
             }
@@ -51,12 +48,19 @@ public class Fifo {
             if (!controlaListas.getFilaBloqueados().isEmpty()) {
                 atenderBloqueado(); // desbloqueia o primeiro processo da fila de bloqueados
             }
-            controlaListas.setExecutando(null);
+           
         }
         if (processo.getPc() < processo.getFase() && processo.getTipo().equals("U")) { // se o pc é menor que o tamanho do processo
-            processo.setPc(processo.getPc()+1);
+            if (processo.getFilaEntradaSaida().get(processo.getPc()) == 0) { // Se na posição pc estiver 0, pc + 1
+                processo.setPc(processo.getPc() + 1); // pc+1 no processo
+            } else if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 0, pc + 1
+                processo.setPc(processo.getPc() + 1); // pc+1 no processo
+                bloqueado();
+                controlaListas.setExecutando(controlaListas.getProcessoSistema());
+                processar(controlaListas.getExecutando());
+            }
+            controlaListas.addFilaProntos(processo);
             System.out.println(processo.toString());
-
         } else if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
             controlaListas.setExecutando(null);
             controlaListas.getFilaProntos().removeFirst();
@@ -64,13 +68,12 @@ public class Fifo {
     }
 
     public void atenderBloqueado() {
-        controlaListas.addFilaProntos(controlaListas.getFilaBloqueados().getFirst());
+        controlaListas.setExecutando(controlaListas.getFilaBloqueados().getFirst());
         controlaListas.getFilaBloqueados().removeFirst();
     }
 
     private void bloqueado() {
         controlaListas.addFilaBloqueados(controlaListas.getExecutando());
-//        controlaListas.setExecutando(null);
     }
 
     private Processo procuraProcessoSistema(Processo processo) {
