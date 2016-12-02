@@ -50,24 +50,24 @@ public class RoundRobin {
                 controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // pega o primeiro processo da lista de pronto para executar
                 controlaListas.getFilaProntos().removeFirst();
             }
-            if (this.tempoAtual % 7 == 0) { // a cada tres iterações o processo do sistema é chamado
+            if (this.tempoAtual % 5 == 0) { // a cada tres iterações o processo do sistema é chamado
                 controlaListas.addFilaProntos(controlaListas.getProcessoSistema()); // adiciona processo do sistema na lista de prontos
             }
-            processar(controlaListas.getExecutando());
+            System.out.println("Quantum = " + quantum);
             verificaQuantum();
+            processar(controlaListas.getExecutando());
             this.tempoAtual++; // incrementa o tempo atual
         } while (true);
     }
 
     public void processar(Processo processo) {
-        quantum++;
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
             System.out.println("-------- SISTEMA ---------");
             if (!controlaListas.getFilaBloqueados().isEmpty()) {
                 atenderBloqueado(); // desbloqueia o primeiro processo da fila de bloqueados
             }
             controlaListas.setExecutando(null);
-            quantum = 0;
+            quantum = -1;
         }
         if (processo.getPc() < processo.getFase() && processo.getTipo().equals("U")) { // se o pc é menor que o tamanho do processo
             if (processo.getFilaEntradaSaida().get(processo.getPc()) == 0) { // Se na posição pc estiver 0, pc + 1
@@ -76,14 +76,15 @@ public class RoundRobin {
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
                 bloqueado();
                 controlaListas.setExecutando(null);
-                quantum = 0;
+                quantum = -1;
             }
             controlaListas.addFilaProntos(processo);
             System.out.println(processo.toString());
         } else if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
             controlaListas.setExecutando(null);
-            quantum = 0;
+            quantum = -1;
         }
+        quantum++;
     }
 
     private void atenderBloqueado() {

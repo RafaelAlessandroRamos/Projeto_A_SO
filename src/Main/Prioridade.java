@@ -20,7 +20,7 @@ public class Prioridade {
         executar();
     }
 
-    public void verificaTempo(int tempoAtual) {
+    public void verificarTempo(int tempoAtual) {
         for (int i = 0; i < controlaListas.getListaProcessos().size(); i++) {
             if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) { // verifica se o tempo atual na linha de tempo é igual ao tempo de chegada de algum processo na lista de processos
                 controlaListas.addFilaProntos(controlaListas.getListaProcessos().get(i)); // Adiciona um processo na lista de prontos
@@ -49,7 +49,7 @@ public class Prioridade {
             if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getFilaBloqueados().isEmpty() && controlaListas.getFilaProntos().isEmpty() && controlaListas.getExecutando() == null) { // condição de parada: se tudo estiver vazio para o laço
                 break;
             }
-            verificaTempo(this.tempoAtual);
+            verificarTempo(this.tempoAtual);
             if (!controlaListas.getFilaProntos().isEmpty()) { // se a fila de pronto nao estiver vazia
                 controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 0); // ordena a lista de prontos por prioridade
                 controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // pega o primeiro processo da lista de pronto para executar
@@ -80,7 +80,7 @@ public class Prioridade {
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
             } else if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 0, pc + 1
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
-                bloqueado();
+                bloquear();
                 controlaListas.setExecutando(null);
             }
             controlaListas.addFilaProntos(processo);
@@ -96,7 +96,7 @@ public class Prioridade {
         controlaListas.getFilaBloqueados().removeFirst();
     }
 
-    private void bloqueado() {
+    private void bloquear() {
         controlaListas.addFilaBloqueados(controlaListas.getExecutando());
     }
 }

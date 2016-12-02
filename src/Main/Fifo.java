@@ -3,8 +3,6 @@
  */
 package Main;
 
-import java.util.concurrent.DelayQueue;
-
 /**
  *
  * @author Rafael
@@ -16,10 +14,11 @@ public class Fifo {
 
     public Fifo(ControlaListas controlaListas) {
         this.controlaListas = controlaListas;
+        System.out.println("Processos : " + controlaListas.getListaProcessos());
         executar();
     }
 
-    public void verificaTempo(int tempoAtual) {
+    public void verificarTempo(int tempoAtual) {
         for (int i = 0; i < controlaListas.getListaProcessos().size(); i++) {
             if (tempoAtual == controlaListas.getListaProcessos().get(i).getTempoChegada()) {
                 controlaListas.addFilaProntos(controlaListas.getListaProcessos().get(i));
@@ -33,29 +32,41 @@ public class Fifo {
             if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getFilaBloqueados().isEmpty() && controlaListas.getFilaProntos().isEmpty() && controlaListas.getExecutando() == null) { // condição de parada: se tudo estiver vazio para o laço
                 break;
             }
-            verificaTempo(this.tempoAtual);
+            verificarTempo(this.tempoAtual);
             if (!controlaListas.getFilaProntos().isEmpty()) { // se a fila de pronto nao estiver vazia
                 controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // pega o primeiro processo da lista de pronto para executar
             }
             processar(controlaListas.getExecutando());
             this.tempoAtual++; // incrementa o tempo atual
         } while (true);
+        System.out.println("///////////////////////////////////////////");
+        controlaListas.imprimeListaTempoEspera();
+        System.out.println("////////////////////////////////////////////");
+        controlaListas.imprimeListaTempoEsperaTotal();
+        System.out.println("////////////////////////////////////////////");
+        System.out.println("Throughput do sistema : " + controlaListas.getMaxProcessoSistema());
+        System.out.println("////////////////////////////////////////////");
     }
 
     public void processar(Processo processo) {
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
+            controlaListas.tamanhoMaximoProcessoSistema();
             System.out.println("-------- SISTEMA ---------");
             if (!controlaListas.getFilaBloqueados().isEmpty()) {
                 atenderBloqueado(); // desbloqueia o primeiro processo da fila de bloqueados
             }
-           
+
         }
         if (processo.getPc() < processo.getFase() && processo.getTipo().equals("U")) { // se o pc é menor que o tamanho do processo
+            if (processo.getPc() == 0) {
+                processo.setTempoEspera(tempoAtual - processo.getTempoChegada());
+                controlaListas.addListaTempoEspera(processo);
+            }
             if (processo.getFilaEntradaSaida().get(processo.getPc()) == 0) { // Se na posição pc estiver 0, pc + 1
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
             } else if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 0, pc + 1
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
-                bloqueado();
+                bloquear();
                 controlaListas.setExecutando(controlaListas.getProcessoSistema());
                 processar(controlaListas.getExecutando());
             }
@@ -72,17 +83,7 @@ public class Fifo {
         controlaListas.getFilaBloqueados().removeFirst();
     }
 
-    private void bloqueado() {
+    private void bloquear() {
         controlaListas.addFilaBloqueados(controlaListas.getExecutando());
-    }
-
-    private Processo procuraProcessoSistema(Processo processo) {
-        for (int i = 0; i < controlaListas.getFilaProntos().size(); i++) {
-            if (controlaListas.getFilaProntos().get(i).getTipo().equals("S")) {
-                processo = controlaListas.getFilaProntos().get(i);
-                controlaListas.getFilaProntos().remove(i);
-            }
-        }
-        return processo;
     }
 }

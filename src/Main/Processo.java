@@ -13,7 +13,7 @@ import java.util.LinkedList;
  */
 public class Processo {
 
-    private int id, fase, prioridade, tempoChegada, pc;
+    private int id, fase, prioridade, tempoChegada, pc, tempoEspera = 0;
     private String tipo, io = ""; // Usuario (U) ou sistema(S)
     private LinkedList<Integer> filaEntradaSaida = new LinkedList<>(); // mapa do processo
 
@@ -51,6 +51,22 @@ public class Processo {
                 j++;
             }
         }
+    }
+
+    public int getTempoEspera() {
+        return tempoEspera;
+    }
+
+    public void setTempoEspera(int tempoEspera) {
+        this.tempoEspera = tempoEspera;
+    }
+
+    public String getIo() {
+        return io;
+    }
+
+    public void setIo(String io) {
+        this.io = io;
     }
 
     public int getId() {

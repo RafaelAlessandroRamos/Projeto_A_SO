@@ -17,12 +17,17 @@ public class ControlaListas{
     private LinkedList<Processo> filaProntos = new LinkedList<Processo>(); // Armazena os processos prontos para execução 
     private LinkedList<Processo> filaBloqueados = new LinkedList<Processo>(); // Armazena os processos bloqueados para execução
     private Processo executando;
+    private int qtdProcessos;
+    private int maxProcessoSistema = 0;
     private Processo processoSistema = new Processo(-1,1,-5,-1,"S");
+    private LinkedList<Integer> listaTempoEspera = new LinkedList<Integer>(); // Armazena os tempos de espera de cada processo
+    private LinkedList<Integer> listaTempoEsperaId = new LinkedList<Integer>(); // Armazena os tempos de espera de cada processo
 
     public ControlaListas() {
-//        filaProntos.add(processoSistema);
         executando = processoSistema;
     }
+    
+    
     
     private boolean verificaItemOrdenar(Processo p1, Processo p2, int parametro){ // verifica para qual item a lista de prontos vai ser ordenada
         if(parametro == 0){// Prioridade
@@ -68,6 +73,7 @@ public class ControlaListas{
     }
     
     public void addListaProcessos(Processo processo){
+        qtdProcessos++;
         listaProcessos.add(processo);
     }
     
@@ -90,7 +96,72 @@ public class ControlaListas{
     public void removeFilaBloqueados(Processo processo){
         filaBloqueados.remove(processo.getId());
     }
- 
+    
+    public void addListaTempoEspera(Processo processo){
+        listaTempoEspera.add(processo.getTempoEspera());
+        listaTempoEsperaId.add(processo.getId());
+    }
+    
+    public void imprimeListaTempoEsperaTotal(){
+        int media = 0;
+        for (int i = 0; i < listaTempoEspera.size(); i++) {
+            media += listaTempoEspera.get(i);
+        }
+        media /= qtdProcessos;
+        System.out.println("Tempo Médio de Espera : " + media);
+    }
+    
+    public void tamanhoMaximoProcessoSistema(){
+        int cont = 0;
+        for (int i = 0; i < filaProntos.size(); i++) {
+            if(filaProntos.get(i).getTipo().equals("S")){
+                cont++;
+            }
+        }
+        if(cont > maxProcessoSistema){
+            maxProcessoSistema = cont;
+        }
+    }
+
+    public void imprimeListaTempoEspera(){
+        for (int i = 0; i < listaTempoEspera.size(); i++) {
+        System.out.println("id : " + listaTempoEsperaId.get(i) + "  Tempo de Espera : " + listaTempoEspera.get(i));
+            
+        }
+    }
+
+    public int getQtdProcessos() {
+        return qtdProcessos;
+    }
+
+    public void setQtdProcessos(int qtdProcessos) {
+        this.qtdProcessos = qtdProcessos;
+    }
+
+    public int getMaxProcessoSistema() {
+        return maxProcessoSistema;
+    }
+
+    public void setMaxProcessoSistema(int maxProcessoSistema) {
+        this.maxProcessoSistema = maxProcessoSistema;
+    }
+
+    public LinkedList<Integer> getListaTempoEspera() {
+        return listaTempoEspera;
+    }
+
+    public void setListaTempoEspera(LinkedList<Integer> listaTempoEspera) {
+        this.listaTempoEspera = listaTempoEspera;
+    }
+
+    public LinkedList<Integer> getListaTempoEsperaId() {
+        return listaTempoEsperaId;
+    }
+
+    public void setListaTempoEsperaId(LinkedList<Integer> listaTempoEsperaId) {
+        this.listaTempoEsperaId = listaTempoEsperaId;
+    }
+    
     public LinkedList<Processo> getFilaProntos() {
         return filaProntos;
     }
