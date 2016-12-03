@@ -93,8 +93,8 @@ public class RoundRobin {
             System.out.println(processo.toString());
             if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
                 controlaListas.setExecutando(null);
-                quantum = -1;
                 controlaListas.addListaTempoEspera(processo);
+                quantum = -1;
             }
         }
         quantum++;
