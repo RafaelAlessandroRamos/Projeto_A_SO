@@ -51,7 +51,7 @@ public class SJF {
             }
             verificaTempo(this.tempoAtual);
             if (!controlaListas.getFilaProntos().isEmpty()) { // se a fila de pronto nao estiver vazia
-                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 0); // ordena a lista de prontos por prioridade
+                controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
                 controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // pega o primeiro processo da lista de pronto para executar
                 controlaListas.getFilaProntos().removeFirst();
             }
@@ -65,9 +65,14 @@ public class SJF {
             processar(controlaListas.getExecutando());
             this.tempoAtual++; // incrementa o tempo atual
         } while (true);
+        System.out.println("////////////////////////////////////////////");
+        System.out.println("Tamanho maximo da fila de pronto : " + controlaListas.getMaxFilaProntos());
+        System.out.println("Tamanho maximo da fila de bloqueados : " + controlaListas.getMaxFilaBloqueados());
+        System.out.println("////////////////////////////////////////////");
     }
 
     public void processar(Processo processo) {
+        controlaListas.tamanhoMaximoFilas();
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
             System.out.println("-------- SISTEMA ---------");
             if (!controlaListas.getFilaBloqueados().isEmpty()) {

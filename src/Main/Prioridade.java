@@ -43,9 +43,9 @@ public class Prioridade {
 
     public void executar() {
         do {
-            //System.out.println(" ========LISTA PRONTOS     " + controlaListas.getFilaProntos());
-            //System.out.println(" ---------LISTA BLOQUEADOS  " + controlaListas.getFilaBloqueados());
-            //System.out.println(" **********EXECULTANDO  " + controlaListas.getExecutando());
+//            System.out.println(" ========LISTA PRONTOS     " + controlaListas.getFilaProntos());
+//            System.out.println(" ---------LISTA BLOQUEADOS  " + controlaListas.getFilaBloqueados());
+//            System.out.println(" **********EXECULTANDO  " + controlaListas.getExecutando());
             if (controlaListas.getListaProcessos().isEmpty() && controlaListas.getFilaBloqueados().isEmpty() && controlaListas.getFilaProntos().isEmpty() && controlaListas.getExecutando() == null) { // condição de parada: se tudo estiver vazio para o laço
                 break;
             }
@@ -57,17 +57,24 @@ public class Prioridade {
             }
             if (this.tempoAtual % 3 == 0) { // a cada tres iterações o processo do sistema é chamado
                 controlaListas.addFilaProntos(controlaListas.getProcessoSistema()); // adiciona processo do sistema na lista de prontos
-                //controlaListas.getProcessoSistema().setPc(0); // seta o pc do processo de sistema para 0
                 controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 0); // ordena a lista de prontos por prioridade
-                //controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // o primeiro da fila de prontos vai executar
-                //controlaListas.getFilaProntos().removeFirst();
             }
             processar(controlaListas.getExecutando());
             this.tempoAtual++; // incrementa o tempo atual
         } while (true);
+        System.out.println("///////////////////////////////////////////");
+        controlaListas.imprimeListaTempoEspera();
+        System.out.println("////////////////////////////////////////////");
+        controlaListas.imprimeListaTempoEsperaTotal();
+        System.out.println("////////////////////////////////////////////");
+        System.out.println("Tamanho maximo da fila de pronto : " + controlaListas.getMaxFilaProntos());
+        System.out.println("Tamanho maximo da fila de bloqueados : " + controlaListas.getMaxFilaBloqueados());
+        System.out.println("////////////////////////////////////////////");
     }
 
     public void processar(Processo processo) {
+        processo.setTempoEspera(processo.getTempoEspera() + (tempoAtual - processo.getTempoPreempcao())); // soma cada intervalo de tempo de espera
+        controlaListas.tamanhoMaximoFilas();
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
             System.out.println("-------- SISTEMA ---------");
             if (!controlaListas.getFilaBloqueados().isEmpty()) {
@@ -80,14 +87,18 @@ public class Prioridade {
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
             } else if (processo.getFilaEntradaSaida().get(processo.getPc()) == 1) { // Se na posição pc estiver 0, pc + 1
                 processo.setPc(processo.getPc() + 1); // pc+1 no processo
+                processo.setTempoPreempcao(tempoAtual);
                 bloquear();
                 controlaListas.setExecutando(null);
             }
             controlaListas.addFilaProntos(processo);
-            System.out.println(processo.toString());
 
-        } else if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
-            controlaListas.setExecutando(null);
+            System.out.println(processo.toString());
+            
+            if ((processo.getPc() == processo.getFase())) {
+                controlaListas.setExecutando(null);
+                controlaListas.addListaTempoEspera(processo);
+            }
         }
     }
 

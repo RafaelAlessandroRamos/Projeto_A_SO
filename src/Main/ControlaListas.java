@@ -12,42 +12,41 @@ import java.util.List;
  *
  * @author Rafael
  */
-public class ControlaListas{
+public class ControlaListas {
+
     private LinkedList<Processo> listaProcessos = new LinkedList<Processo>(); // Armazena todos os processos prontos
     private LinkedList<Processo> filaProntos = new LinkedList<Processo>(); // Armazena os processos prontos para execução 
     private LinkedList<Processo> filaBloqueados = new LinkedList<Processo>(); // Armazena os processos bloqueados para execução
     private Processo executando;
     private int qtdProcessos;
-    private int maxProcessoSistema = 0;
-    private Processo processoSistema = new Processo(-1,1,-5,-1,"S");
+    private int maxFilaProntos = 0;
+    private int maxFilaBloqueados = 0;
+    private Processo processoSistema = new Processo(-1, 1, -5, -1, "S");
     private LinkedList<Integer> listaTempoEspera = new LinkedList<Integer>(); // Armazena os tempos de espera de cada processo
     private LinkedList<Integer> listaTempoEsperaId = new LinkedList<Integer>(); // Armazena os tempos de espera de cada processo
 
     public ControlaListas() {
         executando = processoSistema;
     }
-    
-    
-    
-    private boolean verificaItemOrdenar(Processo p1, Processo p2, int parametro){ // verifica para qual item a lista de prontos vai ser ordenada
-        if(parametro == 0){// Prioridade
-            if(p1.getPrioridade() <= p2.getPrioridade()){
+
+    private boolean verificaItemOrdenar(Processo p1, Processo p2, int parametro) { // verifica para qual item a lista de prontos vai ser ordenada
+        if (parametro == 0) {// Prioridade
+            if (p1.getPrioridade() <= p2.getPrioridade()) {
                 return true;
             }
-        }
-        else if(parametro == 1){// SJF
-            if((p1.getFase() - p1.getPc()) <= (p2.getFase() - p2.getPc())){
+        } else if (parametro == 1) {// SJF
+            if ((p1.getFase() - p1.getPc()) <= (p2.getFase() - p2.getPc())) {
                 return true;
             }
         }
         return false;
     }
-    
+
     private int partition(List<Processo> lista, int start, int end, int parametro) {
         Processo aux;
         Processo pivot = lista.get(end);
         int pIndex = start;
-        boolean b; 
+        boolean b;
         for (int i = start; i < end; i++) {
             b = verificaItemOrdenar(lista.get(i), pivot, parametro); // verifica qual o tipo de ordenação e faz a comparação
             if (b) { // if true
@@ -71,38 +70,38 @@ public class ControlaListas{
         }
         return lista;
     }
-    
-    public void addListaProcessos(Processo processo){
+
+    public void addListaProcessos(Processo processo) {
         qtdProcessos++;
         listaProcessos.add(processo);
     }
-    
-    public void removeListaProcessos(Processo processo){
+
+    public void removeListaProcessos(Processo processo) {
         listaProcessos.remove(processo.getId());
     }
-    
-    public void addFilaProntos(Processo processo){
+
+    public void addFilaProntos(Processo processo) {
         filaProntos.add(processo);
     }
-    
-    public void removeFilaProntos(Processo processo){
+
+    public void removeFilaProntos(Processo processo) {
         filaProntos.remove(processo.getId());
     }
-    
-    public void addFilaBloqueados(Processo processo){
+
+    public void addFilaBloqueados(Processo processo) {
         filaBloqueados.add(processo);
     }
-    
-    public void removeFilaBloqueados(Processo processo){
+
+    public void removeFilaBloqueados(Processo processo) {
         filaBloqueados.remove(processo.getId());
     }
-    
-    public void addListaTempoEspera(Processo processo){
+
+    public void addListaTempoEspera(Processo processo) {
         listaTempoEspera.add(processo.getTempoEspera());
         listaTempoEsperaId.add(processo.getId());
     }
-    
-    public void imprimeListaTempoEsperaTotal(){
+
+    public void imprimeListaTempoEsperaTotal() {
         int media = 0;
         for (int i = 0; i < listaTempoEspera.size(); i++) {
             media += listaTempoEspera.get(i);
@@ -110,23 +109,20 @@ public class ControlaListas{
         media /= qtdProcessos;
         System.out.println("Tempo Médio de Espera : " + media);
     }
-    
-    public void tamanhoMaximoProcessoSistema(){
-        int cont = 0;
-        for (int i = 0; i < filaProntos.size(); i++) {
-            if(filaProntos.get(i).getTipo().equals("S")){
-                cont++;
-            }
+
+    public void tamanhoMaximoFilas() {
+        if (filaProntos.size() > maxFilaProntos) {
+            maxFilaProntos = filaProntos.size();
         }
-        if(cont > maxProcessoSistema){
-            maxProcessoSistema = cont;
+        if (filaBloqueados.size() > maxFilaBloqueados) {
+            maxFilaBloqueados = filaBloqueados.size();
         }
     }
 
-    public void imprimeListaTempoEspera(){
+    public void imprimeListaTempoEspera() {
         for (int i = 0; i < listaTempoEspera.size(); i++) {
-        System.out.println("id : " + listaTempoEsperaId.get(i) + "  Tempo de Espera : " + listaTempoEspera.get(i));
-            
+            System.out.println("id : " + listaTempoEsperaId.get(i) + "  Tempo de Espera : " + listaTempoEspera.get(i));
+
         }
     }
 
@@ -138,14 +134,22 @@ public class ControlaListas{
         this.qtdProcessos = qtdProcessos;
     }
 
-    public int getMaxProcessoSistema() {
-        return maxProcessoSistema;
+    public int getMaxFilaProntos() {
+        return maxFilaProntos;
     }
 
-    public void setMaxProcessoSistema(int maxProcessoSistema) {
-        this.maxProcessoSistema = maxProcessoSistema;
+    public void setMaxFilaProntos(int maxFilaProntos) {
+        this.maxFilaProntos = maxFilaProntos;
     }
 
+    public int getMaxFilaBloqueados() {
+        return maxFilaBloqueados;
+    }
+
+    public void setMaxFilaBloqueados(int maxFilaBloqueados) {
+        this.maxFilaBloqueados = maxFilaBloqueados;
+    }
+    
     public LinkedList<Integer> getListaTempoEspera() {
         return listaTempoEspera;
     }
@@ -161,7 +165,7 @@ public class ControlaListas{
     public void setListaTempoEsperaId(LinkedList<Integer> listaTempoEsperaId) {
         this.listaTempoEsperaId = listaTempoEsperaId;
     }
-    
+
     public LinkedList<Processo> getFilaProntos() {
         return filaProntos;
     }
@@ -201,6 +205,5 @@ public class ControlaListas{
     public void setProcessoSistema(Processo processoSistema) {
         this.processoSistema = processoSistema;
     }
-    
-    
+
 }

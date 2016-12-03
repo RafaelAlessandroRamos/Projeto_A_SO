@@ -44,13 +44,14 @@ public class Fifo {
         System.out.println("////////////////////////////////////////////");
         controlaListas.imprimeListaTempoEsperaTotal();
         System.out.println("////////////////////////////////////////////");
-        System.out.println("Throughput do sistema : " + controlaListas.getMaxProcessoSistema());
+        System.out.println("Tamanho maximo da fila de pronto : " + controlaListas.getMaxFilaProntos());
+        System.out.println("Tamanho maximo da fila de bloqueados : " + controlaListas.getMaxFilaBloqueados());
         System.out.println("////////////////////////////////////////////");
     }
 
     public void processar(Processo processo) {
+        controlaListas.tamanhoMaximoFilas();
         if (processo.getTipo().equals("S")) { // Se o processo é do tipo Sistema(S)
-            controlaListas.tamanhoMaximoProcessoSistema();
             System.out.println("-------- SISTEMA ---------");
             if (!controlaListas.getFilaBloqueados().isEmpty()) {
                 atenderBloqueado(); // desbloqueia o primeiro processo da fila de bloqueados
@@ -75,7 +76,9 @@ public class Fifo {
         } else if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
             controlaListas.setExecutando(null);
             controlaListas.getFilaProntos().removeFirst();
+            
         }
+        controlaListas.tamanhoMaximoFilas();
     }
 
     public void atenderBloqueado() {
