@@ -1,0 +1,1 @@
+Coloque o arquivo de dados de entrada dentro da pasta Projeto_A_SO com o nome de Dados_Entrada.
