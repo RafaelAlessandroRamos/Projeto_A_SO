@@ -57,10 +57,7 @@ public class SJF {
             }
             if (this.tempoAtual % 3 == 0) { // a cada tres iterações o processo do sistema é chamado
                 controlaListas.addFilaProntos(controlaListas.getProcessoSistema()); // adiciona processo do sistema na lista de prontos
-                //controlaListas.getProcessoSistema().setPc(0); // seta o pc do processo de sistema para 0
                 controlaListas.quickSort(controlaListas.getFilaProntos(), 0, controlaListas.getFilaProntos().size() - 1, 1); // ordena a lista de prontos por prioridade
-                //controlaListas.setExecutando(controlaListas.getFilaProntos().getFirst()); // o primeiro da fila de prontos vai executar
-                //controlaListas.getFilaProntos().removeFirst();
             }
             processar(controlaListas.getExecutando());
             this.tempoAtual++; // incrementa o tempo atual

@@ -54,8 +54,8 @@ public class RoundRobin {
                 controlaListas.addFilaProntos(controlaListas.getProcessoSistema()); // adiciona processo do sistema na lista de prontos
             }
             System.out.println("Quantum = " + quantum);
-            verificaQuantum();
             processar(controlaListas.getExecutando());
+            verificaQuantum();
             this.tempoAtual++; // incrementa o tempo atual
         } while (true);
         System.out.println("///////////////////////////////////////////");
