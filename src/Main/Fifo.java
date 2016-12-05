@@ -71,7 +71,7 @@ public class Fifo {
                 controlaListas.setExecutando(controlaListas.getProcessoSistema());
                 processar(controlaListas.getExecutando());
             }
-            controlaListas.addFilaProntos(processo);
+            //controlaListas.addFilaProntos(processo);
             System.out.println(processo.toString());
         } else if ((processo.getPc() == processo.getFase())) { // Se acabou a lista de IO o processo encerra
             controlaListas.setExecutando(null);
