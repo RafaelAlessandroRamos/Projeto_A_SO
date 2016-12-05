@@ -102,7 +102,7 @@ public class ControlaListas {
     }
 
     public void imprimeListaTempoEsperaTotal() {
-        int media = 0;
+        float media = 0;
         for (int i = 0; i < listaTempoEspera.size(); i++) {
             media += listaTempoEspera.get(i);
         }
